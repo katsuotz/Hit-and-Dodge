@@ -3,19 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <main id="content">
-    <form action="" id="form-join">
-        <input type="text" placeholder="Room Id" id="room_id">
-    </form>
-    <canvas id="canvas" width="960" height="600"></canvas>
+
+    <div class="modal">
+        <div class="modal-dialog">
+            <div class="modal-overlay">
+                <div class="modal-body text-center">
+                    <form action="" id="form-join" class="step-1">
+                        <input type="text" placeholder="Room Id" id="room_id">
+                        <button type="submit">Join</button>
+                    </form>
+
+                    <div class="step-2 hide">
+                        <button id="ready">Ready</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <canvas id="canvas" width="1200" height="900"></canvas>
 </main>
 
 <script src="./socket.io/socket.io.js"></script>
-<script src="./Main.js"></script>
+<script src="Main.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
     // Global Variable
@@ -24,26 +38,59 @@
     let ctx = canvas.getContext('2d');
     let main = new Main();
 
+    var socket = io('http://10.22.212.157:3000');
+
+    let player = {};
+
+    function collidedWithBall() {
+        socket.emit('got-hit', main.player);
+    }
+
+    function playerHit() {
+        socket.emit('hit', player);
+    }
+
     $(function () {
-        // Socket
-
-        var socket = io('http://localhost:3000');
-
         let form = $("#form-join");
 
         form.on('submit', function (e) {
             e.preventDefault();
             let room_id = $('#room_id');
             if (room_id) {
+                player.name = 'user_' + Math.random().toString(36).substr(2, 9);
+
                 socket.emit('join', {
-                    name: 'user_' + Math.random().toString(36).substr(2, 9),
+                    name: player.name,
                     room: room_id.val()
                 });
             }
         });
 
         socket.on('connected', function (res) {
+            console.log(res);
+
+            main.player = res.player;
+
+            $('.step-1').addClass('hide');
+            $('.step-2').removeClass('hide');
+        });
+
+        $('#ready').on('click', function () {
+            socket.emit('ready', {});
+        });
+
+        socket.on('start-game', function (res) {
+            $('.modal').addClass('hide');
+        });
+
+        socket.on('render', function (res) {
             main.init(res.data.users, res.data.total_user, res.data.ball);
+        });
+
+        document.addEventListener('keydown', async function (e) {
+            if (e.key == 'z') {
+                main.hit();
+            }
         });
     });
 </script>

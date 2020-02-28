@@ -19,3 +19,40 @@ html,body {
 #canvas {
     border: 2px solid #000;
 }
+
+.hide {
+    display: none;
+}
+
+/* Modal */
+
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,.08);
+    overflow: auto;
+}
+
+.modal-dialog {
+    max-width: 800px;
+    margin: 0 auto;
+    padding-top: 2rem;
+}
+
+.modal-overlay {
+    background-color: #fff;
+    border-radius: .4rem;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+/* Text */
+
+.text-center {
+    text-align: center;
+}
