@@ -67,8 +67,6 @@
         });
 
         socket.on('connected', function (res) {
-            console.log(res);
-
             main.player = res.player;
 
             $('.step-1').addClass('hide');
@@ -90,6 +88,8 @@
         document.addEventListener('keydown', async function (e) {
             if (e.key == 'z') {
                 main.hit();
+            } else if (e.key == 'x') {
+                main.dodge();
             }
         });
     });

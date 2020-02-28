@@ -50,27 +50,39 @@ class Main {
         let player = this.users[this.player.id];
 
         if (player.hp > 0) {
-            let rectW = 120 / 2;
+            let rectW = (this.dodging ? 60 : 140) / 2;
             let rectH = 80 / 2;
 
-            if (this.checkBallCollision({
+            if (!this.player_get_hit && this.checkBallCollision({
                 x1: player.x - rectW,
                 y1: player.y - rectH,
                 x2: player.x + rectW,
                 y2: player.y + rectH,
             })) {
+                this.player_get_hit = true;
                 collidedWithBall();
+            } else {
+                let player_radius = 80;
+
+                if (!this.checkBallCollision({
+                    x1: player.x - player_radius,
+                    y1: player.y - player_radius,
+                    x2: player.x + player_radius,
+                    y2: player.y + player_radius,
+                })) {
+                    this.player_get_hit = false;
+                }
             }
             this.checkHp();
         }
     }
 
     checkHp() {
+        // console.log(this.users[this.player.id].hp);
         if (this.users[this.player.id].hp === 0) {
             alert('game-over')
         }
     }
-
 
     drawPlatform() {
         let circleR = this.circleR;
@@ -92,7 +104,7 @@ class Main {
 
         let x = (this.circleR / 2) * 2 * Math.cos(rad) + this.circleX;
         let y = (this.circleR / 2) * 2 * Math.sin(rad) + this.circleY;
-        let rectW = 120;
+        let rectW = this.dodging ? 60 : 140;
         let rectH = 80;
 
         // ctx.beginPath();
@@ -154,34 +166,45 @@ class Main {
         }
     }
 
-    doHit() {
-        let player = this.users[this.player.id];
+    dodge() {
+        if (!this.dodging) {
+            this.dodging = true;
 
-        let player_radius = 80;
-
-        if (this.hitting && !this.ball_got_hit) {
-            if (this.checkBallCollision({
-                x1: player.x - player_radius,
-                y1: player.y - player_radius,
-                x2: player.x + player_radius,
-                y2: player.y + player_radius,
-            })) {
-                this.ball_got_hit = true;
-                console.log(12391239123);
-                playerHit();
-            }
+            setTimeout(() => {
+                this.dodging = false;
+            }, 500);
         }
+    }
 
-        if (this.ball_got_hit) {
-            if (!this.checkBallCollision({
-                x1: player.x - player_radius,
-                y1: player.y - player_radius,
-                x2: player.x + player_radius,
-                y2: player.y + player_radius,
-            })) {
-                setTimeout(() => {
-                    this.ball_got_hit = false;
-                }, 200);
+    doHit() {
+        if (!this.player_get_hit) {
+            let player = this.users[this.player.id];
+
+            let player_radius = 80;
+
+            if (this.hitting && !this.ball_got_hit) {
+                if (this.checkBallCollision({
+                    x1: player.x - player_radius,
+                    y1: player.y - player_radius,
+                    x2: player.x + player_radius,
+                    y2: player.y + player_radius,
+                })) {
+                    this.ball_got_hit = true;
+                    playerHit();
+                }
+            }
+
+            if (this.ball_got_hit) {
+                if (!this.checkBallCollision({
+                    x1: player.x - player_radius,
+                    y1: player.y - player_radius,
+                    x2: player.x + player_radius,
+                    y2: player.y + player_radius,
+                })) {
+                    setTimeout(() => {
+                        this.ball_got_hit = false;
+                    }, 200);
+                }
             }
         }
     }
@@ -189,16 +212,9 @@ class Main {
     checkBallCollision(player) {
         let ball = this.ball;
 
-        if (
+        return (
             ball.x + ball.r > player.x1 && ball.y + ball.r > player.y1 &&
             ball.x < player.x2 && ball.y < player.y2
-        ) {
-            if (this.is_get_hit) return false;
-            this.is_get_hit = true;
-            return true;
-        }
-
-        this.is_get_hit = false;
-        return false;
+        );
     }
 }
