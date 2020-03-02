@@ -12,31 +12,6 @@ app.get('/', function (req, res) {
 let data = {};
 let total_users = 0;
 
-function render(item, room) {
-    if (item) {
-        let d = item;
-        d.ball.angle += d.ball.to_right ? d.ball.speed : -d.ball.speed;
-        d.ball.rotate += d.ball.to_right ? d.ball.speed * 3 : -d.ball.speed * 3;
-
-        io.to(room).emit('render', {
-            data: {
-                ball: {
-                    angle: d.ball.angle,
-                    rotate: d.ball.rotate,
-                },
-                users: d.users,
-                total_user: d.total_user,
-            },
-        });
-    }
-}
-
-function startInterval(item, room) {
-    item.interval = setInterval(() => {
-        render(item, room);
-    }, 1000 / 60);
-}
-
 io.on('connection', function (socket) {
     socket.on('join', function (msg) {
         console.log(msg)
@@ -100,11 +75,32 @@ io.on('connection', function (socket) {
                 data: data[socket.room_id],
             });
 
-            startInterval(data[socket.room_id], socket.room_id);
+            data[socket.room_id].interval = setInterval(() => {
+                render(data[socket.room_id]);
+            }, 1000 / 60);
         }
     });
 
     let last_time = null;
+
+    function render(data) {
+        if (data) {
+            let d = data;
+            d.ball.angle += d.ball.to_right ? d.ball.speed : -d.ball.speed;
+            d.ball.rotate += d.ball.to_right ? d.ball.speed * 3 : -d.ball.speed * 3;
+
+            io.to(socket.room_id).emit('render', {
+                data: {
+                    ball: {
+                        angle: d.ball.angle,
+                        rotate: d.ball.rotate,
+                    },
+                    users: d.users,
+                    total_user: d.total_user,
+                },
+            });
+        }
+    }
 
     socket.on('hitting', function (msg) {
         data[socket.room_id].users[msg.id].hitting = true;
