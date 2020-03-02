@@ -5,6 +5,8 @@
 html,body {
     padding: 0;
     margin: 0;
+    background: linear-gradient(to bottom, #4e2eb6, #ce66d7);
+    font-family: "Century Gothic", "Segoe UI", sans-serif;
 }
 
 #content {
@@ -16,12 +18,88 @@ html,body {
     flex-direction: column;
 }
 
-#canvas {
-    border: 2px solid #000;
+.hide {
+    display: none!important;
 }
 
-.hide {
-    display: none;
+/* Canvas */
+
+.canvas-area {
+    width: 1200px;
+    height: 900px;
+    position: relative;
+}
+
+#canvas {
+    width: 1200px;
+    height: 900px;
+    /*border: 2px solid #000;*/
+}
+
+.canvas-overlay {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.player {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    padding: 1rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.lost {
+    filter: grayscale(1);
+}
+
+.player-name {
+    margin-top: .2rem;
+    margin-bottom: .6rem;
+}
+
+.player:nth-child(1) {
+    top: 0;
+    left: 0;
+}
+
+
+.player:nth-child(2) {
+    top: 0;
+    right: 0;
+}
+
+
+.player:nth-child(3) {
+    bottom: 0;
+    right: 0;
+}
+
+
+.player:nth-child(4) {
+    bottom: 0;
+    left: 0;
+}
+
+.player-image {
+    height: 156px;
+}
+
+.player-health {
+    display: flex;
+}
+
+.player-health img {
+    height: 24px;
+    display: block;
 }
 
 /* Modal */
@@ -34,6 +112,7 @@ html,body {
     bottom: 0;
     background-color: rgba(0,0,0,.08);
     overflow: auto;
+    z-index: 999999999999999;
 }
 
 .modal-dialog {

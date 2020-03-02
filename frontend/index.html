@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Hit & Dodge</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/peach.png">
 </head>
 <body>
 
@@ -14,18 +15,83 @@
             <div class="modal-overlay">
                 <div class="modal-body text-center">
                     <form action="" id="form-join" class="step-1">
-                        <input type="text" placeholder="Room Id" id="room_id">
+                        <div class="form-group">
+                            <input type="text" placeholder="Name" id="name">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="Room Id" id="room_id">
+                        </div>
                         <button type="submit">Join</button>
                     </form>
 
                     <div class="step-2 hide">
+
+                        <ul class="player-list"></ul>
+
                         <button id="ready">Ready</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <canvas id="canvas" width="1200" height="900"></canvas>
+
+    <div class="canvas-area">
+        <div class="canvas-overlay">
+            <div class="player player-1 hide">
+                <img src="assets/mario.png" alt="Player 1" class="player-image">
+
+                <span class="player-name">PLAYER 1</span>
+
+                <div class="player-health">
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                </div>
+            </div>
+            <div class="player player-2 hide">
+                <img src="assets/luigi.png" alt="Player 2" class="player-image">
+
+                <span class="player-name">PLAYER 2</span>
+
+                <div class="player-health">
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                </div>
+            </div>
+            <div class="player player-3 hide">
+                <img src="assets/peach.png" alt="Player 3" class="player-image">
+
+                <span class="player-name">PLAYER 3</span>
+
+                <div class="player-health">
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                </div>
+            </div>
+            <div class="player player-4 hide">
+                <img src="assets/yoshi.png" alt="Player 4" class="player-image">
+
+                <span class="player-name">PLAYER 4</span>
+
+                <div class="player-health">
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                    <span><img src="assets/health.png" alt="Health"></span>
+                </div>
+            </div>
+        </div>
+        <canvas id="canvas" width="1200" height="900"></canvas>
+    </div>
 </main>
 
 <script src="./socket.io/socket.io.js"></script>
@@ -38,16 +104,24 @@
     let ctx = canvas.getContext('2d');
     let main = new Main();
 
-    var socket = io('http://10.22.212.157:3000');
+    let clientId = 'client_' + Math.random().toString(36).substr(2, 9);
 
-    let player = {};
+    var socket = io('http://10.22.212.157:3000');
 
     function collidedWithBall() {
         socket.emit('got-hit', main.player);
     }
 
+    function playerHitting() {
+        socket.emit('hitting', main.player);
+    }
+
     function playerHit() {
-        socket.emit('hit', player);
+        socket.emit('hit', main.player);
+    }
+
+    function playerDodge() {
+        socket.emit('dodge', main.player);
     }
 
     $(function () {
@@ -56,18 +130,28 @@
         form.on('submit', function (e) {
             e.preventDefault();
             let room_id = $('#room_id');
-            if (room_id) {
-                player.name = 'user_' + Math.random().toString(36).substr(2, 9);
-
+            let name = $('#name');
+            if (room_id.val() && name.val()) {
                 socket.emit('join', {
-                    name: player.name,
-                    room: room_id.val()
+                    name: name.val(),
+                    room: room_id.val(),
+                    clientId: clientId,
                 });
             }
         });
 
         socket.on('connected', function (res) {
-            main.player = res.player;
+            console.log(res)
+            if (res.player.clientId === clientId) main.player = res.player;
+
+            let s = ``;
+
+            for (let k in res.data.users) {
+                let user = res.data.users[k];
+                s += `<li>${user.name}</li>`
+            }
+
+            $('.player-list').html(s);
 
             $('.step-1').addClass('hide');
             $('.step-2').removeClass('hide');
@@ -77,8 +161,22 @@
             socket.emit('ready', {});
         });
 
+        socket.on('game-over', function (res) {
+            alert(res.data.winner + ' Win!');
+        });
+
         socket.on('start-game', function (res) {
             $('.modal').addClass('hide');
+
+            let i = 0;
+
+            for (let k in res.data.users) {
+                let user = res.data.users[k];
+                i++;
+
+                $(`.player-${i}`).removeClass('hide');
+                $(`.player-${i} .player-name`).html(user.name);
+            }
         });
 
         socket.on('render', function (res) {
