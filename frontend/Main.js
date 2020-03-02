@@ -230,7 +230,7 @@ class Main {
 
         return (
             ball.x + ball.r > player.x1 && ball.y + ball.r > player.y1 &&
-            ball.x < player.x2 && ball.y < player.y2
+            ball.x - ball.r < player.x2 && ball.y - ball.r < player.y2
         );
     }
 }
