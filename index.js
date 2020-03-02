@@ -89,11 +89,9 @@ io.on('connection', function (socket) {
             d.ball.angle += d.ball.to_right ? d.ball.speed : -d.ball.speed;
             d.ball.rotate += d.ball.to_right ? d.ball.speed * 3 : -d.ball.speed * 3;
 
-            console.log('broadcasting')
-
             io.to(socket.room_id).emit('render', {
                 data: {
-                    ball: d,
+                    ball: d.ball,
                     users: d.users,
                     total_user: d.total_user,
                 },
@@ -144,7 +142,6 @@ io.on('connection', function (socket) {
         }
 
         if (die >= total_user - 1) {
-            console.log('gg');
             clearInterval(data[socket.room_id].interval);
             data[socket.room_id].interval = null;
             render(data[socket.room_id]);
