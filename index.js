@@ -13,9 +13,9 @@ let data = {};
 let total_users = 0;
 
 io.on('connection', function (socket) {
-
     socket.on('join', function (msg) {
         console.log(msg)
+
         socket.room_id = msg.room;
 
         socket.join(msg.room);
@@ -81,11 +81,15 @@ io.on('connection', function (socket) {
         }
     });
 
+    let last_time = null;
+
     function render(data) {
         if (data) {
             let d = data;
             d.ball.angle += d.ball.to_right ? d.ball.speed : -d.ball.speed;
             d.ball.rotate += d.ball.to_right ? d.ball.speed * 3 : -d.ball.speed * 3;
+
+            console.log('broadcasting')
 
             io.to(socket.room_id).emit('render', {
                 status: 'success',

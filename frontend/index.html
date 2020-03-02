@@ -108,6 +108,12 @@
 
     var socket = io();
 
+    let start = Date.now();
+
+    socket.on('pong', function (latency) {
+        console.log(latency);
+    });
+
     function collidedWithBall() {
         socket.emit('got-hit', main.player);
     }
