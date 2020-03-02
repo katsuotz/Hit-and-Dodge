@@ -2,7 +2,7 @@
     box-sizing: border-box;
 }
 
-html,body {
+html, body {
     padding: 0;
     margin: 0;
     background: linear-gradient(to bottom, #4e2eb6, #ce66d7);
@@ -19,7 +19,7 @@ html,body {
 }
 
 .hide {
-    display: none!important;
+    display: none !important;
 }
 
 /* Canvas */
@@ -110,7 +110,7 @@ html,body {
     top: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,.08);
+    background-color: rgba(0, 0, 0, .08);
     overflow: auto;
     z-index: 999999999999999;
 }
@@ -128,6 +128,13 @@ html,body {
 
 .modal-body {
     padding: 2rem;
+}
+
+.player-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Text */

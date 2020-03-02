@@ -26,6 +26,18 @@
 
                     <div class="step-2 hide">
 
+                        <div style="color: #F00;">
+                            <p>Minimum Player: 2</p>
+                            <p>Press Z to Hit</p>
+                            <p>Press X to Dodge</p>
+                            <p>Blue box is your player</p>
+                            <p>Red box is an hit box (range you can hit the ball)</p>
+                        </div>
+
+                        <h3>Welcome to "<span id="lobby-name"></span>" lobby</h3>
+
+                        <p>Player list:</p>
+
                         <ul class="player-list"></ul>
 
                         <button id="ready">Ready</button>
@@ -109,10 +121,6 @@
     var socket = io();
     let start = Date.now();
 
-    socket.on('pong', function (latency) {
-        console.log(latency);
-    });
-
     function collidedWithBall() {
         socket.emit('got-hit', main.player);
     }
@@ -137,6 +145,8 @@
             let room_id = $('#room_id');
             let name = $('#name');
             if (room_id.val() && name.val()) {
+                $('#lobby-name').html(room_id.val());
+
                 socket.emit('join', {
                     name: name.val(),
                     room: room_id.val(),
