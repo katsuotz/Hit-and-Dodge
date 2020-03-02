@@ -106,7 +106,7 @@
 
     let clientId = 'client_' + Math.random().toString(36).substr(2, 9);
 
-    var socket = io('http://10.22.212.157:3000');
+    var socket = io();
 
     function collidedWithBall() {
         socket.emit('got-hit', main.player);
