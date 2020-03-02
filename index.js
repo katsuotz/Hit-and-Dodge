@@ -12,9 +12,9 @@ app.get('/', function (req, res) {
 let data = {};
 let total_users = 0;
 
-function render(data, room) {
-    if (data) {
-        let d = data;
+function render(item, room) {
+    if (item) {
+        let d = item;
         d.ball.angle += d.ball.to_right ? d.ball.speed : -d.ball.speed;
         d.ball.rotate += d.ball.to_right ? d.ball.speed * 3 : -d.ball.speed * 3;
 
@@ -31,9 +31,9 @@ function render(data, room) {
     }
 }
 
-function startInterval(data, room) {
-    data.interval = setInterval(() => {
-        render(data, room);
+function startInterval(item, room) {
+    item.interval = setInterval(() => {
+        render(item, room);
     }, 1000 / 60);
 }
 
