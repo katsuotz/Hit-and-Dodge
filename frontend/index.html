@@ -167,11 +167,14 @@
         });
 
         socket.on('game-over', function (res) {
+            main.ready = false;
             alert(res.data.winner + ' Win!');
         });
 
         socket.on('start-game', function (res) {
             $('.modal').addClass('hide');
+
+            main.ready = true;
 
             let i = 0;
 
@@ -188,11 +191,26 @@
             main.init(res.data.users, res.data.total_user, res.data.ball);
         });
 
+        let keyActiveZ = false;
+        let keyActiveX = false;
+
         document.addEventListener('keydown', async function (e) {
+            if (main.ready) {
+                if (e.key == 'z' && !keyActiveZ) {
+                    keyActiveZ = true;
+                    main.hit();
+                } else if (e.key == 'x' && !keyActiveX) {
+                    keyActiveX = true;
+                    main.dodge();
+                }
+            }
+        });
+
+        document.addEventListener('keyup', async function (e) {
             if (e.key == 'z') {
-                main.hit();
+                keyActiveZ = false;
             } else if (e.key == 'x') {
-                main.dodge();
+                keyActiveX = false;
             }
         });
     });

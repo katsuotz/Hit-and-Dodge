@@ -111,7 +111,8 @@ io.on('connection', function (socket) {
         data[socket.room_id].users[msg.id].hitting = true;
 
         setTimeout(() => {
-            data[socket.room_id].users[msg.id].hitting = false;
+            if (data[socket.room_id])
+                data[socket.room_id].users[msg.id].hitting = false;
         }, 500);
     });
     socket.on('hit', function (msg) {

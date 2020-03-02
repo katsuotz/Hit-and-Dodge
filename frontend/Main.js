@@ -12,6 +12,7 @@ class Main {
         this.ball_image.src = 'assets/star.png';
 
         this.player = null;
+        this.ready = false;
     }
 
     init(users, total_user, ball) {
@@ -62,7 +63,7 @@ class Main {
             let rectW = (player.dodging ? 60 : 140) / 2;
             let rectH = 80 / 2;
 
-            if (!player.dodging && !this.player_get_hit && this.checkBallCollision({
+            if (!player.dodging && !player.hitting && !this.player_get_hit && this.checkBallCollision({
                 x1: player.x - rectW,
                 y1: player.y - rectH,
                 x2: player.x + rectW,
@@ -82,13 +83,6 @@ class Main {
                     this.player_get_hit = false;
                 }
             }
-            this.checkHp();
-        }
-    }
-
-    checkHp() {
-        if (this.users[this.player.id].hp === 0) {
-            alert('game-over')
         }
     }
 
