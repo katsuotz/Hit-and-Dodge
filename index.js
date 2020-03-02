@@ -12,7 +12,33 @@ app.get('/', function (req, res) {
 let data = {};
 let total_users = 0;
 
+function startInterval(d, room) {
+    return setInterval(() => {
+        render(d, room);
+    }, 1000 / 60);
+}
+
+function render(d, room) {
+    if (d) {
+        d.ball.angle += d.ball.to_right ? d.ball.speed : -d.ball.speed;
+        d.ball.rotate += d.ball.to_right ? d.ball.speed * 3 : -d.ball.speed * 3;
+
+        io.to(room).emit('render', {
+            data: {
+                ball: {
+                    angle: d.ball.angle,
+                    rotate: d.ball.rotate,
+                },
+                users: d.users,
+                total_user: d.total_user,
+            },
+        });
+    }
+}
+
+
 io.on('connection', function (socket) {
+
     socket.on('join', function (msg) {
         console.log(msg)
 
@@ -75,32 +101,11 @@ io.on('connection', function (socket) {
                 data: data[socket.room_id],
             });
 
-            data[socket.room_id].interval = setInterval(() => {
-                render(data[socket.room_id]);
-            }, 1000 / 60);
+            data[socket.room_id].interval = startInterval(data[socket.room_id], socket.room_id);
         }
     });
 
     let last_time = null;
-
-    function render(data) {
-        if (data) {
-            let d = data;
-            d.ball.angle += d.ball.to_right ? d.ball.speed : -d.ball.speed;
-            d.ball.rotate += d.ball.to_right ? d.ball.speed * 3 : -d.ball.speed * 3;
-
-            io.to(socket.room_id).emit('render', {
-                data: {
-                    ball: {
-                        angle: d.ball.angle,
-                        rotate: d.ball.rotate,
-                    },
-                    users: d.users,
-                    total_user: d.total_user,
-                },
-            });
-        }
-    }
 
     socket.on('hitting', function (msg) {
         data[socket.room_id].users[msg.id].hitting = true;
@@ -147,7 +152,7 @@ io.on('connection', function (socket) {
         if (die >= total_user - 1) {
             clearInterval(data[socket.room_id].interval);
             data[socket.room_id].interval = null;
-            render(data[socket.room_id]);
+            render(data[socket.room_id], socket.room_id);
             delete data[socket.room_id];
 
             socket.to(socket.room_id).emit('game-over', {

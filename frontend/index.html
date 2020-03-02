@@ -107,7 +107,6 @@
     let clientId = 'client_' + Math.random().toString(36).substr(2, 9);
 
     var socket = io();
-
     let start = Date.now();
 
     socket.on('pong', function (latency) {
