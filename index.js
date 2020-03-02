@@ -92,8 +92,11 @@ io.on('connection', function (socket) {
             console.log('broadcasting')
 
             io.to(socket.room_id).emit('render', {
-                status: 'success',
-                data: data,
+                data: {
+                    ball: d,
+                    users: d.users,
+                    total_user: d.total_user,
+                },
             });
         }
     }
@@ -160,7 +163,11 @@ io.on('connection', function (socket) {
         return false;
     }
 
-    socket.on('disconnecting', function () {
+    // socket.on('disconnecting', function () {
+    // });
+
+    socket.on('disconnect', function () {
+
         if (data[socket.room_id]) {
             if (!data[socket.room_id].ready) {
                 delete data[socket.room_id].users[this.id];
@@ -170,18 +177,7 @@ io.on('connection', function (socket) {
                 data[socket.room_id].users[this.id].hp = 0;
                 if (gameOver()) return 0;
             }
-
-            // connected(socket.room_id);
-
-            // if (data[socket.room_id] && data[socket.room_id].users[this.id]) {
-            // io.to(socket.room_id).emit('render', {
-            //     status: 'success',
-            //     data: data[socket.room_id],
-            //     player: data[socket.room_id].users[this.id],
-            // });
-            // }
         }
-
 
         console.log('disconnected');
     });
