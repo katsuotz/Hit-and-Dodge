@@ -1,0 +1,10 @@
+before_script:
+  - cd /home/someah/hit-and-dodge
+variables:
+  GIT_STRATEGY: none
+deploying:
+  stage: build
+  script:
+    - git pull
+    - npm i
+    - pm2 restart hitdodge
