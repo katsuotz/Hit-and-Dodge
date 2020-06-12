@@ -1,7 +1,19 @@
 const express = require('express');
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+
+
+
+let options = {
+    requestCert: false,
+    rejectUnauthorized: false
+}
+
+const http = require('http').createServer(options, app);
+const io = require('socket.io')(http,{
+    origins: '*:*',
+    secure: true,
+    transport: ['websocket']
+});
 
 app.use(express.static(__dirname + '/frontend'));
 
@@ -40,8 +52,6 @@ function render(d, room) {
 io.on('connection', function (socket) {
 
     socket.on('join', function (msg) {
-        console.log(msg)
-
         socket.room_id = msg.room;
 
         socket.join(msg.room);
@@ -179,16 +189,11 @@ io.on('connection', function (socket) {
                 delete data[socket.room_id].users[this.id];
                 data[socket.room_id].total_user--;
             } else {
-                console.log(data[socket.room_id].users[this.id])
                 data[socket.room_id].users[this.id].hp = 0;
                 if (gameOver()) return 0;
             }
         }
-
-        console.log('disconnected');
     });
-
-    console.log('user connected');
 });
 
 http.listen(3000, function () {
